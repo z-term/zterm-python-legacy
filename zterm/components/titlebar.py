@@ -1,3 +1,4 @@
+from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QPoint
 from PyQt5.QtWidgets import QHBoxLayout
 from qfluentwidgets import FluentIcon as FIF
@@ -16,10 +17,14 @@ class ZTermTitleBar(MSFluentTitleBar):
         self.searchButton = TransparentToolButton(
             FIF.SEARCH_MIRROR.icon(color=color), self
         )
+        self.settingsButton = TransparentToolButton(
+            FIF.SETTING.icon(color=color), self
+        )
 
         self.toolButtonLayout.setContentsMargins(20, 0, 20, 0)
-        self.toolButtonLayout.setSpacing(15)
+        self.toolButtonLayout.setSpacing(10)
         self.toolButtonLayout.addWidget(self.searchButton)
+        self.toolButtonLayout.addWidget(self.settingsButton)
         self.hBoxLayout.insertLayout(4, self.toolButtonLayout)
 
         # add tab bar

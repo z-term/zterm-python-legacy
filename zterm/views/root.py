@@ -6,6 +6,7 @@ from qfluentwidgets import FluentIcon as FIF
 from qfluentwidgets import *
 
 from zterm.components import *
+from .settings import Settings
 
 
 class Root(MSFluentWindow):
@@ -19,9 +20,13 @@ class Root(MSFluentWindow):
         self.tabBar.tabAddRequested.connect(self.onTabAddRequested)
         self.tabBar.tabCloseRequested.connect(self.onTabClosed)
 
+
         self.init_ui()
         self.init_window()
         self.onTabAddRequested()
+
+        self.titleBar.settingsButton.clicked.connect(self.open_settings)
+        self.settings_opened = False
 
     def init_ui(self):
         self.stack = QStackedWidget(self, objectName="stack")
@@ -32,7 +37,7 @@ class Root(MSFluentWindow):
         self.navigationInterface.hide()
 
     def init_window(self):
-        self.resize(700, 400)
+        self.resize(1080, 600)
         self.setMinimumWidth(700)
         self.setMinimumHeight(400)
         self.setWindowTitle("ZTerm")
@@ -44,15 +49,29 @@ class Root(MSFluentWindow):
         self.show()
         QApplication.processEvents()
 
+    def open_settings(self):
+        if self.settings_opened:
+            return
+        self.addTab('settings', "Settings", Settings(), FIF.SETTING)
+        self.settings_opened = True
+
     def onTabChanged(self, index: int):
         objectName = self.tabBar.currentTab().routeKey()
         self.stack.setCurrentWidget(self.findChild(ZTermTab, objectName))
         self.stackedWidget.setCurrentWidget(self.stack)
         self.tabBar.setCurrentIndex(index)
 
+        # Resize it
+        terminal : Terminal = self.findChild(ZTermTab, objectName).widget
+        terminal.setGeometry(0, 0, self.size().width(), self.size().height())
+        if hasattr(terminal, 'textedit'):
+            terminal.textedit.resize(self.size())
+
     def onTabClosed(self, index: int):
         self.tabBar.setCurrentIndex(index)
         objectName = self.tabBar.currentTab().routeKey()
+        if objectName == "settings":
+            self.settings_opened = False
         tabWidget = self.findChild(ZTermTab, objectName)
         self.stack.removeWidget(tabWidget)
 
@@ -77,6 +96,7 @@ class Root(MSFluentWindow):
             tabWidget = self.findChild(ZTermTab, objectName)
             terminal : Terminal = tabWidget.widget
             terminal.setGeometry(0, 0, event.size().width(), event.size().height())
-            terminal.textedit.resize(event.size())
+            if hasattr(terminal, 'textedit'):
+                terminal.textedit.resize(event.size())
             
 

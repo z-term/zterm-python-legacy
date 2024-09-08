@@ -29,9 +29,9 @@ class TerminalOutputReader(QThread):
                 if p != -1:
                     buf = buf[:p]
 
-                buf = "\n".join(
+                buf = "".join(
                     [
-                        strip_ansi_escape_sequences(i)
+                        convert_ansi_to_html(i)
                         for i in replace_newline(buf).splitlines()
                     ]
                 )

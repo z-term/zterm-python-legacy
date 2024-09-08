@@ -28,7 +28,10 @@ class Terminal(QWidget):
 
         self.cwd = os.getcwd()
         self.shell = os.environ.get("COMSPEC") or os.environ.get("SHELL")
-
+        
+        # Fish is not supported yet
+        if 'fish' in self.shell:
+            self.shell = self.shell.replace("fish", "bash")
         self.process = PTY.spawn([self.shell], cwd=self.cwd)
 
         self.reader = TerminalOutputReader(self.process)
@@ -41,7 +44,7 @@ class Terminal(QWidget):
             background-color: rgba(255, 255, 255, 0.0605);
             border-radius: 0px;
             padding: 5px 5px;
-            font-family: 'Cascadia Mono', Consolas, monospace;
+            font-family: 'Monaspace Krypton', 'Cascadia Mono', Consolas, monospace;
             color: white;
             selection-background-color: --ThemeColorPrimary;
             selection-color: black;"""
@@ -62,7 +65,7 @@ class Terminal(QWidget):
         self.textedit.installEventFilter(self)
 
     def handle_output(self, output):
-        self.textedit.insertPlainText(output)
+        self.textedit.appendHtml(output)
         self.command_end()
 
     def latest_cmd(self) -> str:
